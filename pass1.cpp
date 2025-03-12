@@ -2,9 +2,11 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <string>
 #include "Instruction.h"
 
 void pass1(const std::string &filename, std::vector<Instruction*> &instructions){
+void pass1(const string &filename){
     std::ifstream file(filename);
     if (!file){
         std::cout << "Unable to open file " << filename << ". Shutting down." << std::endl;
