@@ -33,15 +33,3 @@ void pass1(const std::string &filename, std::vector<Instruction*> &instructions)
         }
     }
 }
-
-void parse2Lines(std::vector<std::string> instruction){
-    // check OPTABLE (datatype map) and reference instruction for validitiy
-
-
-
-}
-
-void parse3Lines(){
-    // pass line into object
-    // create object funciton for adding to listing file
-}
