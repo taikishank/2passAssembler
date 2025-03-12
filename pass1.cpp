@@ -2,8 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "Instruction.h"
 
-void pass1(const std::string &filename){
+void pass1(const std::string &filename, std::vector<Instruction*> &instructions){
     std::ifstream file(filename);
     if (!file){
         std::cout << "Unable to open file " << filename << ". Shutting down." << std::endl;
@@ -21,26 +22,14 @@ void pass1(const std::string &filename){
         }
 
         if (words.size() == 2){
-            // pass symbol and value
+            instructions.push_back(new Instruction("", words[0], words[1]));
         }
         else if (words.size() == 3){
-            // pass name, symbol, value
+            instructions.push_back(new Instruction(words[0], words[1], words[2]));
         }
         else{
             std::cout << "ERROR: Invalid input format. Line must contain either 2 or 3 words" << std::endl;
             return;
         }
     }
-}
-
-void parse2Lines(std::vector<std::string> instruction){
-    // check OPTABLE (datatype map) and reference instruction for validitiy
-
-
-
-}
-
-void parse3Lines(){
-    // pass line into object
-    // create object funciton for adding to listing file
 }

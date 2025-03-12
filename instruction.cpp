@@ -14,5 +14,8 @@ void Instruction::writeToListing(std::ofstream &listingFile) const {
     if (!label.empty()){
         listingFile << label << "\t" << opcode << "\t" << operand << std::endl;
     }
+    else{
+        listingFile << "\t" << opcode << "\t" << operand << std::endl; // formatting may be off, won't know until testing
+    }
     return;
 }
