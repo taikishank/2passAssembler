@@ -2,8 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <string>
 
-void pass1(const std::string &filename){
+void pass1(const string &filename){
     std::ifstream file(filename);
     if (!file){
         std::cout << "Unable to open file " << filename << ". Shutting down." << std::endl;
