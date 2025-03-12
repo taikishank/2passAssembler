@@ -3,7 +3,9 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include "Instruction.h"
 
+void pass1(const std::string &filename, std::vector<Instruction*> &instructions){
 void pass1(const string &filename){
     std::ifstream file(filename);
     if (!file){
@@ -22,10 +24,10 @@ void pass1(const string &filename){
         }
 
         if (words.size() == 2){
-            // pass symbol and value
+            instructions.push_back(new Instruction("", words[0], words[1]));
         }
         else if (words.size() == 3){
-            // pass name, symbol, value
+            instructions.push_back(new Instruction(words[0], words[1], words[2]));
         }
         else{
             std::cout << "ERROR: Invalid input format. Line must contain either 2 or 3 words" << std::endl;
