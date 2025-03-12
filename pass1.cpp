@@ -3,10 +3,9 @@
 #include <sstream>
 #include <vector>
 #include <string>
-#include "Instruction.h"
+#include "instruction.h"
 
-void pass1(const std::string &filename, std::vector<Instruction*> &instructions){
-void pass1(const string &filename){
+void pass1(const std::string &filename, std::vector<Instruction*> &instructions, std::ofstream &listingFile){
     std::ifstream file(filename);
     if (!file){
         std::cout << "Unable to open file " << filename << ". Shutting down." << std::endl;
@@ -23,15 +22,20 @@ void pass1(const string &filename){
             words.push_back(word);
         }
 
+        Instruction *instr = nullptr;
+
         if (words.size() == 2){
-            instructions.push_back(new Instruction("", words[0], words[1]));
+            instr = new Instruction("", words[0], words[1]);
         }
         else if (words.size() == 3){
-            instructions.push_back(new Instruction(words[0], words[1], words[2]));
+            instr = new Instruction(words[0], words[1], words[2]);
         }
         else{
             std::cout << "ERROR: Invalid input format. Line must contain either 2 or 3 words" << std::endl;
             return;
         }
+
+        instructions.push_back(instr);
+        instr->writeToListing(listingFile);
     }
 }

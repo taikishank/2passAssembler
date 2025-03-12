@@ -1,10 +1,12 @@
+#ifndef INSTRUCTION_H
+#define INSTRUCTION_H
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
 
 class Instruction{
-
 public:
     std::string label;
     std::string operand;
@@ -15,5 +17,6 @@ public:
 
     // Function to write to a listing file
     void writeToListing(std::ofstream &listingFile) const;
-    
 };
+
+#endif
