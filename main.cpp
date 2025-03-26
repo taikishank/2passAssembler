@@ -6,6 +6,7 @@
 // main.cpp
 
 #include "main.h"
+#include "pass1.h"
 
 int main(int argc, char **argv){
 
@@ -19,13 +20,16 @@ int main(int argc, char **argv){
         file_paths.push_back(argv[i]);
     }
 
+    std::vector <std::string> listing_paths;
+
     for(std::string curr_file: file_paths){
         FILE *fp = fopen(curr_file.c_str(), "r"); // Open the file
         if (fp == nullptr){
             std::cerr << "Unable to open " << curr_file << std::endl;
             return ERROR_RETURN_CODE;
         }
+        
     }
-
+    pass1(file_paths[0], "listing.txt"); // TODO
     return RETURN_CODE; // Return 0 indicating file finished printing
 }
