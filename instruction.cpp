@@ -2,25 +2,10 @@
 
 
 // Constructor
-Instruction::Instruction(std::string lbl, std::string instr, std::string opd)
-    : label(lbl), instruction(instr), operand(opd){}
+Instruction::Instruction(std::string lbl, std::string instr, std::string opd, int addr)
+    : label(lbl), instruction(instr), operand(opd), address(addr){}
 
-void Instruction::writeToListing(std::ofstream &listingFile) const {
-    if (!listingFile){
-        std::cout << "Listing file is not open! Open that shit up dumbass!" << std::endl;
-        return;
-    }
-
-    if (!label.empty()){
-        listingFile << label << "\t" << instruction << "\t" << operand << std::endl;
-    }
-    else{
-        listingFile << "\t" << instruction << "\t" << operand << std::endl; // formatting may be off, won't know until testing
-    }
-    return;
-}
-
-int Instruction::format_check(std::string instruction, std::string operand){
+int Instruction::reserve_address_bytes(){
     if (instruction[0] == '+')
         return 4;
     else if (format2_instructions.find(instruction) != format2_instructions.end())
@@ -29,6 +14,8 @@ int Instruction::format_check(std::string instruction, std::string operand){
         return stoi(operand);
     else if (instruction == "RESW")
         return stoi(operand) * 3;
+    else if (instruction == "START")
+        return 0;
     else if (instruction == "BYTE")
         if (operand[0] == 'C')
             return operand.size() - 3;
