@@ -5,6 +5,7 @@
 #include <string>
 #include "instruction.h"
 #include "pass1.h"
+#include <iomanip>
 
 void pass1(const std::string &filename, std::ofstream &listingFile)
 {
@@ -34,12 +35,14 @@ void pass1(const std::string &filename, std::ofstream &listingFile)
 
         if (words.size() == 2)
         {
+            std::cout << address << "    " << line << std::endl;
             instr = new Instruction("", words[0], words[1], address);
             address = writeToListing(instr, address, listingFile);
             instruction_list.push_back(instr);
         }
         else if (words.size() == 3)
         { // Update symbol table here
+            std::cout << address << "    " << line << std::endl;
             instr = new Instruction(words[0], words[1], words[2], address);
             address = writeToListing(instr, address, listingFile);
             instruction_list.push_back(instr);
@@ -60,16 +63,18 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
         return -1;
     }
 
-    if (!instruction->label.empty())
+    if (!instruction->label.empty() || !instruction->instruction.empty())
     {
+        listingFile << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "\t" << instruction->label << "\t" << instruction->instruction << "\t" << instruction->operand << std::endl;
         int increment = instruction->reserve_address_bytes();
-        listingFile << instruction->address + increment << "\t" << instruction->label << "\t" << instruction->instruction << "\t" << instruction->operand << std::endl;
+        
         current_address += increment;
         return current_address;
     }
     else
     {
-        listingFile << instruction->address << "\t\t" << instruction->instruction << "\t" << instruction->operand << std::endl; // formatting may be off, won't know until testing
+        std::cout << "Address not incremented" << std::endl;
+        listingFile << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "\t\t" << instruction->instruction << "\t" << instruction->operand << std::endl; // formatting may be off, won't know until testing
     }
     return current_address;
 }

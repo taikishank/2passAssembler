@@ -14,8 +14,10 @@ int Instruction::reserve_address_bytes()
         return stoi(operand);
     else if (instruction == "RESW")
         return stoi(operand) * 3;
-    else if (instruction == "START")
+    else if (instruction == "START"){
+        std::cout<< "START ADD REACHED" << std::endl;
         return 0;
+    }
     else if (instruction == "BYTE")
         if (operand[0] == 'C')
             return operand.size() - 3;
