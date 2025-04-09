@@ -32,8 +32,9 @@ void pass1(const std::string &filename, std::ofstream &listingFile)
 
         std::vector<Instruction *> instruction_list;
         Instruction *instr;
-
-        if (words.size() == 2)
+        if (words.size() == 1)
+            std::cout<< "One word" << std::endl;
+        else if (words.size() == 2)
         {
             std::cout << address << "    " << line << std::endl;
             instr = new Instruction("", words[0], words[1], address);
