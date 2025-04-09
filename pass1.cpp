@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "instruction.h"
+#include "pass1.h"
 
 void pass1(const std::string &filename, std::ofstream &listingFile)
 {
@@ -55,8 +56,8 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
 {
     if (!listingFile)
     {
-        std::cout << "Listing file is not open! Open that shit up dumbass!" << std::endl;
-        return;
+        std::cout << "Listing file is not open! Open that up!" << std::endl;
+        return -1;
     }
 
     if (!instruction->label.empty())
@@ -70,5 +71,5 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
     {
         listingFile << instruction->address << "\t\t" << instruction->instruction << "\t" << instruction->operand << std::endl; // formatting may be off, won't know until testing
     }
-    return;
+    return current_address;
 }
