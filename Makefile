@@ -4,7 +4,7 @@ CC = g++
 CCFLAGS = -std=c++11 -g3 -Wall -c
 CFLAGS = -g3 -c
 
-OBJS = main.o pass1.o instruction.o
+OBJS = main.o pass1.o instruction.o labelMap.o
 
 PROGRAM = essy
 
@@ -19,6 +19,9 @@ pass1.o : pass1.cpp pass1.h
 
 instruction.o : instruction.cpp instruction.h
 	$(CC) $(CCFLAGS) -o instruction.o instruction.cpp
+
+labelMap.o : labelMap.cpp labelMap.h
+	$(CC) $(CCFLAGS) -o labelMap.o labelMap.cpp
 
 clean :
 	rm -rf $(OBJS) *~ $(PROGRAM)

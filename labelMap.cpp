@@ -1,4 +1,10 @@
-#include "symbolTable.h"
+#include "labelMap.h"
+#include <set>
+
+std::set <std::string> assembler_directives = {
+    "START", "END", "RESB", "RESW", "BYTE", "WORD", "BASE", "NOBASE",
+    "*", "LTORG", "ORG", "EQU", "USE", "CSECT", "EXTDEF", "EXTREF"
+};
 
 std::map<std::string, std::pair<std::string, int>> symbolTable = {
     {"ADD", {"18", 3}},
@@ -101,4 +107,5 @@ std::map<std::string, std::pair<std::string, int>> symbolTable = {
     {"+TIX", {"2C", 4}},
     {"TIXR", {"B8", 2}},
     {"WD", {"DC", 3}},
-    {"+WD", {"DC", 4}}};
+    {"+WD", {"DC", 4}}
+};

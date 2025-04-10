@@ -5,6 +5,7 @@
 #include "main.h"
 #include "pass1.h"
 
+
 int main(int argc, char **argv)
 {
 
@@ -24,7 +25,10 @@ int main(int argc, char **argv)
 
     for (std::string curr_file : file_paths)
     {
-        std::ofstream listingFile("testListing.txt");
+        std::stringstream listing_file_name;
+        listing_file_name << curr_file << "TESTFILE.l"; // REMOVE TESTFILE LATER 
+        std::string listing_file = listing_file_name.str();
+        std::ofstream listingFile(listing_file);
         if (!listingFile)
         {
             std::cerr << "Unable to open listing file" << std::endl;
@@ -42,4 +46,11 @@ int main(int argc, char **argv)
     }
      // TODO
     return RETURN_CODE;                  // Return 0 indicating file finished printing
+}
+
+
+// IMPLEMENT THIS FUNCTION TO GET THE FILE NAME FROM THE PATH
+std::string getFileName(std::string){
+    return "";
+
 }

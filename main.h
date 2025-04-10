@@ -18,6 +18,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <sstream>
 
 // Constant variable definitions
 #define ERROR_RETURN_CODE (-1) // Exit statement for errors

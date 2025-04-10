@@ -21,6 +21,11 @@ void pass1(const std::string &filename, std::ofstream &listingFile)
     std::string line;
     while (std::getline(file, line))
     {
+        if(line[0] == '.')
+        {
+            listingFile << line << std::endl;
+            continue;
+        }
         std::istringstream iss(line);
         std::vector<std::string> words;
         std::string word;
@@ -32,8 +37,16 @@ void pass1(const std::string &filename, std::ofstream &listingFile)
 
         std::vector<Instruction *> instruction_list;
         Instruction *instr;
-        if (words.size() == 1)
-            std::cout<< "One word" << std::endl;
+
+        // NEED TO FIX FORMATTING ISSUE FOR ADDRESSES
+        // use psample.lst as a reference
+
+        if (words.size() == 1){
+            std::cout << address << "    " << line << std::endl;
+            instr = new Instruction("", words[0], "", address);
+            address = writeToListing(instr, address, listingFile);
+            instruction_list.push_back(instr);
+        }
         else if (words.size() == 2)
         {
             std::cout << address << "    " << line << std::endl;
@@ -63,10 +76,15 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
         std::cout << "Listing file is not open! Open that up!" << std::endl;
         return -1;
     }
+    if(instruction->instruction == "END")
+    {
+        listingFile <<  "\t" "\t" << instruction->label << "\t" << instruction->instruction << "\t" << instruction->operand << std::endl;
+        return current_address;
+    }
 
     if (!instruction->label.empty() || !instruction->instruction.empty())
     {
-        listingFile << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "\t" << instruction->label << "\t" << instruction->instruction << "\t" << instruction->operand << std::endl;
+        listingFile << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "    " << instruction->label << "\t" << instruction->instruction << "\t" << instruction->operand << std::endl;
         int increment = instruction->reserve_address_bytes();
         
         current_address += increment;
