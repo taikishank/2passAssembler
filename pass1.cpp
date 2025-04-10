@@ -78,22 +78,33 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
     }
     if(instruction->instruction == "END")
     {
-        listingFile <<  "\t" "\t" << instruction->label << "\t" << instruction->instruction << "\t" << instruction->operand << std::endl;
+        listingFile <<  "                  " << instruction->instruction 
+        << "       " << instruction->operand << std::endl;
         return current_address;
     }
 
     if (!instruction->label.empty() || !instruction->instruction.empty())
     {
-        listingFile << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "    " << instruction->label << "\t" << instruction->instruction << "\t" << instruction->operand << std::endl;
+        int label_padding = std::max(0, 6 - (int)instruction->label.length());
+        std::string label_whitespace(label_padding, ' ');
+        int instruction_padding = std::max(0, 6 - (int)instruction->instruction.length());
+        std::string instruction_whitespace(instruction_padding, ' ');
+
+        listingFile << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "    " <<
+         instruction->label << label_whitespace << "    " <<
+         instruction->instruction << instruction_whitespace << "    " <<
+         instruction->operand << std::endl;
         int increment = instruction->reserve_address_bytes();
         
         current_address += increment;
         return current_address;
     }
+    /*
     else
     {
         std::cout << "Address not incremented" << std::endl;
         listingFile << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "\t\t" << instruction->instruction << "\t" << instruction->operand << std::endl; // formatting may be off, won't know until testing
     }
+    */
     return current_address;
 }
