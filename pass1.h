@@ -9,8 +9,7 @@ class Instruction; // Forward declaration
 
 // Parses the given file and populates a vector of Instruction pointers.
 // Also writes each instruction to the provided listing file.
-
-void pass1(const std::string &filename, std::ofstream &listingFile);
+std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &listingFile);
 std::ofstream initialize_symbol_table(const std::string &filename);
 void generateSymbolTable(Instruction *instruction, int size, std::ofstream &listingFile);
 void generateLiteralTable(Instruction *instruction);

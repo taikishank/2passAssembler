@@ -7,8 +7,9 @@ Instruction::Instruction(std::string lbl, std::string instr, std::string opd, in
 
 int Instruction::reserve_address_bytes()
 {
-    if (symbolTable.find(instruction) != symbolTable.end()){
-        std::pair<std::string, int> opcode = symbolTable[instruction];
+    if (opcodeTable.find(instruction) != opcodeTable.end())
+    {
+        std::pair<std::string, int> opcode = opcodeTable[instruction];
         if (opcode.second == 4)
             return 4;
         else if (opcode.second == 2)

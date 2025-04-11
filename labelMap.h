@@ -6,6 +6,7 @@
 #include <string>
 #include <utility> // Include for std::pair
 
-extern std::map<std::string, std::pair<std::string, int>> symbolTable; // Declaration of the map
+extern std::map<std::string, std::pair<std::string, int>> opcodeTable; // Declaration of the map
 extern std::set<std::string> assembler_directives;
+extern std::map<std::string, int> symbolTable;
 #endif

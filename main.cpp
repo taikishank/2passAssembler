@@ -4,6 +4,9 @@
 
 #include "main.h"
 #include "pass1.h"
+#include "pass2.h"
+#include "instruction.h"
+#include "labelMap.h"
 
 
 int main(int argc, char **argv)
@@ -22,9 +25,14 @@ int main(int argc, char **argv)
     }
 
     std::vector<std::string> listing_paths;
-    std::vector<std::ofstream> listingFiles;
 
-        for (std::string curr_file : file_paths)
+
+    std::vector<std::ofstream> listingFiles;
+    std::vector<std::vector<Instruction *>> instructionLists;
+    
+
+    // PASS ONE
+    for (std::string curr_file : file_paths)
     {
         std::stringstream listing_file_name;
         // file_name = getFileName(curr_file); // TODO: Implement this function to get the file name from the path
@@ -43,12 +51,22 @@ int main(int argc, char **argv)
             return ERROR_RETURN_CODE;
         }
         std::cout<<"Reading file: " << curr_file << std::endl;
-        //std::ofstream listFile = 
-        pass1(file_paths[0], listingFile);
+        std::vector<Instruction *> instrList = pass1(file_paths[0], listingFile);
         //listingFiles.push_back(listFile);
         listingFile.close();
     }
-    return RETURN_CODE;                  // Return 0 indicating file finished printing
+
+    for (const auto &pair : symbolTable)
+    {
+        std::cout << "Label: " << pair.first << ", Address: " << pair.second << std::endl;
+    }
+
+    // PASS TWO:
+    for(long unsigned int i = 0; i < listingFiles.size(); i++){
+        pass2(listingFiles.at(i), instructionLists.at(i));
+    }
+
+    return RETURN_CODE; // Return 0 indicating file finished printing
 }
 
 

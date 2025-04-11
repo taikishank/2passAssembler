@@ -6,14 +6,15 @@
 #include "instruction.h"
 #include "pass1.h"
 #include <iomanip>
+#include "labelMap.h"
 
-void pass1(const std::string &filename, std::ofstream &listingFile)
+std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &listingFile)
 {
     std::ifstream file(filename);
     if (!file)
     {
         std::cout << "Unable to open file " << filename << ". Shutting down." << std::endl;
-        return;
+        exit(-1);
     }
 
     int address = 0x0000; // we have to update this with the first instruction (START)
@@ -64,12 +65,13 @@ void pass1(const std::string &filename, std::ofstream &listingFile)
             instr = new Instruction(words[0], words[1], words[2], address);
             address = writeToListing(instr, address, listingFile);
             instruction_list.push_back(instr);
+            symbolTable[instr->label] = instr->address;
             label_list.push_back(instr);
         }
         else
         {
             std::cout << "ERROR: Invalid input format. Line must contain either 2 or 3 words" << std::endl;
-            return;
+            exit(-1);
         }
     }
     
@@ -91,7 +93,9 @@ void pass1(const std::string &filename, std::ofstream &listingFile)
     }
 
     //return listingFile;
+    return instruction_list;
 }
+
 
 std::ofstream initialize_symbol_table(const std::string &filename)
 {
