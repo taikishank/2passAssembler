@@ -9,9 +9,8 @@ int Instruction::reserve_address_bytes()
 {
     if (symbolTable.find(instruction) != symbolTable.end()){
         std::pair<std::string, int> opcode = symbolTable[instruction];
-        if (opcode.second == 4){
+        if (opcode.second == 4)
             return 4;
-        }
         else if (opcode.second == 2)
             return 2;
         else if(opcode.second == 1)

@@ -15,5 +15,4 @@
 0024    TABLE     RESW      2000
 1794    TABLE2    RESW      2000
 2F04    TOTAL     RESW      1
-2F07              *         =C'EOF'
                   END       FIRST

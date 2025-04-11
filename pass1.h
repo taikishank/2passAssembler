@@ -11,5 +11,9 @@ class Instruction; // Forward declaration
 // Also writes each instruction to the provided listing file.
 
 void pass1(const std::string &filename, std::ofstream &listingFile);
+std::ofstream initialize_symbol_table(const std::string &filename);
+void generateSymbolTable(Instruction *instruction, int size, std::ofstream &listingFile);
+void generateLiteralTable(Instruction *instruction);
+void initializeLiteralTable(std::ofstream &symbolFile);
 int writeToListing(Instruction *instruction, int current_address, std::ofstream &listingFile);
 #endif // PASS1_H

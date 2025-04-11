@@ -14,7 +14,6 @@ public:
     std::string operand;
     std::string instruction;
     int address;
-    std::set<std::string> format2_instructions;
 
     // Constructor
     Instruction(std::string lbl = "", std::string opc = "", std::string opr = "", int address = -1);
