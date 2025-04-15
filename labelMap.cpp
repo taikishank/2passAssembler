@@ -6,6 +6,17 @@ std::set <std::string> assembler_directives = {
     "*", "LTORG", "ORG", "EQU", "USE", "CSECT", "EXTDEF", "EXTREF"
 };
 
+std::map<std::string, int> registerTable = {
+    {"A", 0},
+    {"X", 1},
+    {"L", 2},
+    {"B", 3},
+    {"S", 4},
+    {"T", 5},
+    {"F", 6},
+    {"PC", 8},
+    {"SW", 9}
+};
 std::map<std::string, int> symbolTable = {}; 
 std::map<std::string, std::pair<std::string, int>> opcodeTable = { 
     {"ADD", {"18", 3}},

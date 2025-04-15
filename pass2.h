@@ -6,9 +6,10 @@
 #include <fstream>
 
 #include "instruction.h"
+#include "labelMap.h"
 
 void pass2(std::ofstream &listingFile, std::vector<Instruction *> instructionList);
-int formatOneOpcode(Instruction *instr);
+std::string formatOneOpcode(Instruction *instr);
 int formatTwoOpcode(Instruction* instr);
 int formatThreeOpcode(Instruction *instr);
 int formatFourOpcode(Instruction *instr);
