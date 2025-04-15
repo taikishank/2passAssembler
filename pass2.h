@@ -10,7 +10,7 @@
 
 void pass2(std::ofstream &listingFile, std::vector<Instruction *> instructionList);
 std::string formatOneOpcode(Instruction *instr);
-int formatTwoOpcode(Instruction* instr);
+std::string formatTwoOpcode(Instruction* instr);
 int formatThreeOpcode(Instruction *instr);
 int formatFourOpcode(Instruction *instr);
 
