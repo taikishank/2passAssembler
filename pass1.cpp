@@ -17,7 +17,7 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
         exit(-1);
     }
 
-    int address = 0x0000; // we have to update this with the first instruction (START)
+    int address = 0; // we have to update this with the first instruction (START)
 
     std::string line;
     std::vector<Instruction *> instruction_list;
@@ -39,21 +39,15 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
             words.push_back(word);
         }
 
-        
-        
         Instruction *instr;
 
         if (words.size() == 1){
-            std::cout << 1 << "    " << line << std::endl;
             instr = new Instruction("", words[0], "", address);
             address = writeToListing(instr, address, listingFile);
             instruction_list.push_back(instr);
         }
         else if (words.size() == 2)
         {
-            std::cout << 2 << "    " << line << std::endl;
-            
-            
             instr = new Instruction("", words[0], words[1], address);
             
             address = writeToListing(instr, address, listingFile);
@@ -61,7 +55,7 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
         }
         else if (words.size() == 3)
         { // Update symbol table here
-            std::cout << 3 << "    " << line << std::endl;
+            //std::cout << 3 << "    " << line << std::endl;
             instr = new Instruction(words[0], words[1], words[2], address);
             address = writeToListing(instr, address, listingFile);
             instruction_list.push_back(instr);
@@ -73,6 +67,7 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
             std::cout << "ERROR: Invalid input format. Line must contain either 2 or 3 words" << std::endl;
             exit(-1);
         }
+        std::cout << address << "    " << line << std::endl;
     }
     
     Instruction* last = instruction_list.back();

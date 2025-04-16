@@ -24,13 +24,8 @@ int main(int argc, char **argv)
         file_paths.push_back(argv[i]);
     }
 
-    std::vector<std::string> listing_paths;
-
-
-    std::vector<std::ofstream> listingFiles;
     std::vector<std::vector<Instruction *>> instructionLists;
     
-
     // PASS ONE
     for (std::string curr_file : file_paths)
     {
@@ -51,19 +46,13 @@ int main(int argc, char **argv)
             return ERROR_RETURN_CODE;
         }
         std::cout<<"Reading file: " << curr_file << std::endl;
-        std::vector<Instruction *> instrList = pass1(file_paths[0], listingFile);
-        //listingFiles.push_back(listFile);
+        std::vector<Instruction *> instrList = pass1(file_paths[0], listingFile); // PASS ONE
+
+        pass2(listingFile, instrList); // PASS TWO
+
+        symbolTable.clear();
+
         listingFile.close();
-    }
-
-    for (const auto &pair : symbolTable)
-    {
-        std::cout << "Label: " << pair.first << ", Address: " << pair.second << std::endl;
-    }
-
-    // PASS TWO:
-    for(long unsigned int i = 0; i < listingFiles.size(); i++){
-        pass2(listingFiles.at(i), instructionLists.at(i));
     }
 
     return RETURN_CODE; // Return 0 indicating file finished printing

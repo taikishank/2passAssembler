@@ -16,3 +16,13 @@
 1794    TABLE2    RESW      2000
 2F04    TOTAL     RESW      1
                   END       FIRST
+0000 0000
+050000
+010000
+
+0000 0000
+1ba000
+1ba000
+2f200e
+3b2ff4
+

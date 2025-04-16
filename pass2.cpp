@@ -8,10 +8,37 @@
 #include <iomanip>
 #include <iostream>
 #include "labelMap.h"
+#include "pass2.h"
 
 void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionList)
 {
-    int i = 1;
+    for(int i = 0; i < instructionList.size(); i++){
+        Instruction *instr = instructionList[i];
+        if(instr->instruction == "END"){
+            listingFile << instr->instruction << " " << instr->operand << std::endl;
+            continue;
+        }
+        if (assembler_directives.find(instr->instruction) != assembler_directives.end())
+        {
+            // Do something with assembler directives
+            listingFile << "0000 0000" << std::endl;
+        }
+        else if(opcodeTable[instr->instruction].second == 1){
+            listingFile << formatOneOpcode(instr) << std::endl;
+        }
+        else if(opcodeTable[instr->instruction].second == 2){
+            listingFile << formatTwoOpcode(instr) << std::endl;
+        }
+        else if(opcodeTable[instr->instruction].second == 3){
+            listingFile << formatThreeOpcode(instr) << std::endl;
+        }
+        else if(opcodeTable[instr->instruction].second == 4){
+            listingFile << formatFourOpcode(instr) << std::endl;
+        }
+        else{
+            std::cerr << "Error: Unknown instruction format for " << instr->instruction << std::endl;
+        }
+    }
 }
 
 std::string formatOneOpcode(Instruction *instr){
@@ -35,40 +62,157 @@ std::string formatTwoOpcode(Instruction *instr){
 }
 
 std::string formatThreeOpcode(Instruction *instr){
-    int n, i, x, b, p; // e always 0 in F3
-    int base = std::stoi(opcodeTable[instr->instruction].first);    // convert string into int
-    if (instr->instruction[0] == '@'){
-        n = 0;
-        i = 1;
-    }    
-    else if (instr->operand[0] == '#'){
+    int n, i, x, b, p, e; // e always 0 in F3
+
+    n = 0;
+    i = 0;
+    x = 0;
+    b = 0;
+    p = 0;
+    e = 0;
+
+    int base = std::stoi(opcodeTable[instr->instruction].first, nullptr, 16);
+    if (instr->instruction[0] == '@')
+    { // Indirect, n = 1
         n = 1;
         i = 0;
-    } 
-    if (instr->operand.find(',') != std::string::npos)   // look for ',' indicating indeXed
-        x = 0;
-    else   
+    }
+    else if (instr->operand[0] == '#'){ // Immediate, i = 1
+        n = 0;
+        i = 1;
+    }
+    else{ // Otherwise, n, i = 1
+        n = 1;
+        i = 1;
+    }
+
+    // look for ',' indicating indeXed
+    if (instr->operand.find(',') != std::string::npos)    // x
         x = 1;
-    int disp = instr->address - 3;  // assuming PC, TA - PC = TA - 3
-    if (disp >= -2048 && disp <= 2047) {
+
+        std::vector<std::string> res;
+        std::stringstream operand_index(instr->operand);
+        std::string token;
+        while (std::getline(operand_index, token, ','))
+        {
+            res.push_back(token);
+        }
+        std::string label = res[0];
+
+        if (symbolTable.find(label) != symbolTable.end()){
+            p = 1;
+        }
+
+
+    else 
+        x = 0;
+
+    std::string operand_copy = instr->operand;
+    int address = 0;
+    if (instr->operand.find('@') != std::string::npos)
+        { // Indirect
+        operand_copy.erase(0, 1);
+        try
+        {
+            std::stoi(operand_copy);
+            address = std::stoi(operand_copy);
+        }
+        catch (std::invalid_argument &e)
+        {
+            if (symbolTable.find(instr->instruction) != symbolTable.end()) // If there is a valid label in the symbol table, use that address
+            {
+                address = symbolTable[operand_copy];
+            }
+            else{
+                std::cerr << "Error: Invalid label " << operand_copy << std::endl;
+                return "";
+            }
+        }
+    }
+
+    else if (instr->operand.find('#') != std::string::npos){
+        operand_copy.erase(0, 1);
+        if (symbolTable.find(instr->instruction) != symbolTable.end()) // If there is a valid label in the symbol table, use that address
+        {
+            address = symbolTable[operand_copy];
+        }
+        else{
+            try{
+                std::stoi(operand_copy);
+                address = std::stoi(operand_copy);
+            }
+            catch (std::invalid_argument &e){
+                std::cerr << "Error: Invalid label " << operand_copy << std::endl;
+                return "";
+            }
+        }
+        b = 0;
+        p = 0;
+        //std::cout << "disp: " << address << std::endl;
+    }
+        
+    else if(symbolTable.find(instr->operand) != symbolTable.end()){
+        // std::string hex1 = std::to_string(symbolTable[instr->operand]);
+        // std::string hex2 = std::to_string(instr->address + 3);
+        // int val1 = std::stoi(hex1, nullptr, 16);
+        // int val2 = std::stoi(hex2, nullptr, 16);
+
+        // std::cout << "disp: " << val1 << std::endl;
+        // std::cout << "disp: " << val2 << std::endl;
+        // address = val1 - val2;
+
+
+        address = symbolTable[instr->operand] - (instr->address + 3);
+        //std::string hex1 = std::to_string(address);
+        //address = std::stoi(hex1, nullptr, 10);
+
+        //hex->dec, dec->hex
+        std::cout << "Second: " << std::dec << symbolTable[instr->operand] << std::endl;
+        std::cout << "First: " << std::dec << instr->address << std::endl;
+        // std::stringstream ihatethis;
+        // std::stringstream ss;
+        // ihatethis << std::hex << address;
+        // std::cout << "I HATE THIS: " << ihatethis.str() << std::endl;
+        // std::string pretend = ihatethis.str();
+        // ss << std::hex << pretend;
+        // std::string pretend2 = ss.str();
+        // int double_hex = std::stoi(pretend2, nullptr, 16);
+        // std::cout << "DOUBLE HEX: " << std::hex << double_hex << std::endl;
+
+        address &= 0xFFF; // Mask to 12 bits in case of negative values
         b = 0;
         p = 1;
-    } else {
-        b = 1;
-        p = 0;
+
     }
-    
+        
+    std::cout << instr->instruction << std::endl;
+
+    std::cout << "Disp: " << std::hex << address << std::endl;
+
     std::stringstream ss;
-    int opcode = (base & 0xFC) | (n << 1) | i;  // 0xFC = 11111100
+    ss << std::hex << std::setfill('0'); // pad with 0s
+
+    int opcode = (base & 0xFC) | (n << 1) | i;
     ss << std::setw(2) << opcode;
-    int flags = (x << 3) | (b << 2) | (p << 1);
-    int byte2 = (flags << 4) | ((disp >> 8) & 0x0F);
+
+    int flags = (x << 3) | (b << 2) | (p << 1) | e;
+    int byte2 = (flags << 4) | ((address >> 8) & 0x0F);
     ss << std::setw(2) << byte2;
+
+    int byte3 = address & 0xFF;
+    ss << std::setw(2) << byte3;
+
+    std:: cout << base << std::endl;
+    std::cout << instr->instruction << " nixbpe: " << n << " " << i << " " << x << " " << b << " " << p << " " << e << " " << std::endl;
+
+    std::cout << ss.str() << std::endl;
+    std::cout << "" << std::endl;
 
     return ss.str();
 }
-int formatFourOpcode(Instruction *instr){
-
+std::string formatFourOpcode(Instruction *instr)
+{
+    return "";
 }
 
 // for every instruction in instruction list 
@@ -77,3 +221,8 @@ int formatFourOpcode(Instruction *instr){
 // traverse through the current line, reach the end add space, insert opcode 
 // Each format has its own algorithm
     // (Function)
+
+
+
+// If we need PC:
+// we check if the label is in the symbol table

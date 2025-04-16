@@ -11,7 +11,7 @@
 void pass2(std::ofstream &listingFile, std::vector<Instruction *> instructionList);
 std::string formatOneOpcode(Instruction *instr);
 std::string formatTwoOpcode(Instruction* instr);
-int formatThreeOpcode(Instruction *instr);
-int formatFourOpcode(Instruction *instr);
+std::string formatThreeOpcode(Instruction *instr);
+std::string formatFourOpcode(Instruction *instr);
 
 #endif // PASS2_H
