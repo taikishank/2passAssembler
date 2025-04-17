@@ -70,6 +70,7 @@ std::string formatThreeOpcode(Instruction *instr){
     b = 0;
     p = 0;
     e = 0;
+    int address = 0;
 
     int base = std::stoi(opcodeTable[instr->instruction].first, nullptr, 16);
     if (instr->instruction[0] == '@')
@@ -101,6 +102,14 @@ std::string formatThreeOpcode(Instruction *instr){
 
         if (symbolTable.find(label) != symbolTable.end()){
             p = 1;
+            address = symbolTable[label] - (instr->address + 3);
+
+            std::cout << "Second: " << std::dec << symbolTable[label] << std::endl;
+            std::cout << "First: " << std::dec << instr->address << std::endl;
+
+            address &= 0xFFF;
+            b = 0;
+            p = 1;
         }
 
 
@@ -108,7 +117,7 @@ std::string formatThreeOpcode(Instruction *instr){
         x = 0;
 
     std::string operand_copy = instr->operand;
-    int address = 0;
+    
     if (instr->operand.find('@') != std::string::npos)
         { // Indirect
         operand_copy.erase(0, 1);
@@ -152,34 +161,12 @@ std::string formatThreeOpcode(Instruction *instr){
     }
         
     else if(symbolTable.find(instr->operand) != symbolTable.end()){
-        // std::string hex1 = std::to_string(symbolTable[instr->operand]);
-        // std::string hex2 = std::to_string(instr->address + 3);
-        // int val1 = std::stoi(hex1, nullptr, 16);
-        // int val2 = std::stoi(hex2, nullptr, 16);
-
-        // std::cout << "disp: " << val1 << std::endl;
-        // std::cout << "disp: " << val2 << std::endl;
-        // address = val1 - val2;
-
-
         address = symbolTable[instr->operand] - (instr->address + 3);
-        //std::string hex1 = std::to_string(address);
-        //address = std::stoi(hex1, nullptr, 10);
 
-        //hex->dec, dec->hex
         std::cout << "Second: " << std::dec << symbolTable[instr->operand] << std::endl;
         std::cout << "First: " << std::dec << instr->address << std::endl;
-        // std::stringstream ihatethis;
-        // std::stringstream ss;
-        // ihatethis << std::hex << address;
-        // std::cout << "I HATE THIS: " << ihatethis.str() << std::endl;
-        // std::string pretend = ihatethis.str();
-        // ss << std::hex << pretend;
-        // std::string pretend2 = ss.str();
-        // int double_hex = std::stoi(pretend2, nullptr, 16);
-        // std::cout << "DOUBLE HEX: " << std::hex << double_hex << std::endl;
-
-        address &= 0xFFF; // Mask to 12 bits in case of negative values
+        
+        address &= 0xFFF;
         b = 0;
         p = 1;
 
