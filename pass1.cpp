@@ -17,6 +17,10 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
         exit(-1);
     }
 
+    std::stringstream literalTable;
+    
+    literalTable << "\nLiteral Table\nName  Operand   Address  Length:\n--------------------------------\n";
+
     int address = 0; // we have to update this with the first instruction (START)
 
     std::string line;
@@ -56,7 +60,6 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
         else if (words.size() == 2)
         {
             instr = new Instruction("", words[0], words[1], address);
-            
             address = writeToListing(instr, address, listingFile);
             instruction_list.push_back(instr);
         }
@@ -75,6 +78,45 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
             exit(-1);
         }
         //std::cout << address << "    " << line << std::endl;
+
+        //std::cout << "instr->instruction[0]" << instr->instruction[0] << std::endl;
+
+        if (instr->instruction[0] == '*' && instr->operand[0] == '='){
+            
+            if (instr->operand[1] == 'X'){
+                std::string op = instr->operand.substr(3, instr->operand.size() - 4);
+                int length = op.size();
+
+                int name_padding = std::max(0, 3 - length);
+                std::string name_whitespace(name_padding, ' ');
+
+                int operand_padding = std::max(0, 6 - length);
+                std::string label_whitespace(operand_padding, ' ');
+
+                literalTable << op << name_whitespace << "   "
+                             << op << label_whitespace << "    " << 
+                             instr->address << "     " << length;
+            }
+            else{ // 'C'
+                std::string op = instr->operand.substr(3, (instr->operand.size() - 4));
+
+                int length = op.size();
+                int name_padding = std::max(0, 3 - length);
+                std::string name_whitespace(name_padding, ' ');
+
+                int operand_padding = std::max(0, 6 - (length * 2));
+                std::string operand_whitespace(operand_padding, ' ');
+
+                literalTable << op << name_whitespace << "   ";
+                for (char c : op)
+                {
+                    literalTable << std::hex << std::uppercase << static_cast<int>(c);
+                }
+                
+                literalTable <<  operand_whitespace << "    " << 
+                instr->address << "     " << length << std::endl;
+            }
+        }
     }
     
     Instruction* last = instruction_list.back();
@@ -83,25 +125,14 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
     std::cout << "Last Instruction Info: " << last->instructionListingInfo << last->address << std::endl;
 
     
-    
-
-    // Generate symbol table
-    //int size = last->address + last->reserve_address_bytes();
-    
     std::ofstream symbol_table_file = initialize_symbol_table(filename);
 
     for( Instruction* instr: label_list){
-        //std::cout << "Generating symbol table for: " << instr->label << instr->instruction << std::endl;
         generateSymbolTable(instr, size, symbol_table_file);
     }
 
-    initializeLiteralTable(symbol_table_file);
-    for(Instruction* instr: literal_list){
-        //std::cout << "Generating literal table for: " << instr->label << instr->instruction << std::endl;
-        generateLiteralTable(instr);
-    }
+    symbol_table_file << literalTable.str();
 
-    //return listingFile;
     return instruction_list;
 }
 
@@ -130,9 +161,12 @@ void generateSymbolTable(Instruction *instr, int size, std::ofstream &listingFil
         int label_padding = std::max(0, 6 - (int)instr->label.length());
         std::string label_whitespace(label_padding, ' ');
 
-        listingFile << instr->label << label_whitespace << "  " << "      " << "  " 
-        << std::hex << std::setw(6) << std::setfill('0') << std::uppercase << instr->address 
-        << "  " << size << "  " << std::endl;
+
+            listingFile << instr->label << label_whitespace << "  "
+                << "      "
+                << "  "
+                << std::hex << std::setw(6) << std::setfill('0') << std::uppercase << instr->address
+                << "  " << size << "  " << std::endl;
     }
     else{
         int label_padding = std::max(0, 6 - (int)instr->label.length());
@@ -145,17 +179,6 @@ void generateSymbolTable(Instruction *instr, int size, std::ofstream &listingFil
                     << "      " << "  "
                     << "R" << std::endl;
     }
-}
-void initializeLiteralTable(std::ofstream &symbolFile)
-{
-    symbolFile << "" << std::endl;
-    symbolFile << "Literal Table"  << std::endl;
-    symbolFile << "Name  Operand   Address  Length:" << std::endl;
-    symbolFile << "--------------------------------" << std::endl;
-}
-
-void generateLiteralTable(Instruction *instruction){
-
 }
 
 int writeToListing(Instruction *instruction, int current_address, std::ofstream &listingFile)
@@ -173,21 +196,14 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
         listing << "                  " + instruction->instruction + "       " + instruction->operand;
         instruction->instructionListingInfo = listing.str();
 
-        /* Potential Deletion
-        listingFile <<  "                  " << instruction->instruction 
-        << "       " << instruction->operand << std::endl;
-        // End of Potential Deletion
-        */
         return current_address;
     }
     if(instruction->label == "*"){
         std::stringstream listing;
-        listing << "                  " + instruction->instruction + "       " + instruction->operand;
+        listing << "                  " + instruction->instruction + "      " + instruction->operand;
         
         instruction->instructionListingInfo = listing.str(); 
 
-        // std::string bytes = instruction->operand;
-        // bytes = bytes.substr(1, 2);
         return current_address + (instruction->instruction.size() - 4); // CONFIRM THIS IS TRUE OR NOT
     }
 
@@ -200,23 +216,29 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
 
         std::stringstream listing;
 
+        
+
         listing << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "    " <<
-         instruction->label << label_whitespace << "    " <<
-         instruction->instruction << instruction_whitespace << "    " <<
+         instruction->label << label_whitespace << "  ";
+
+        if (instruction->instruction[0] != '+'){
+            listing << " ";
+        }
+
+        listing << instruction->instruction << instruction_whitespace << "  ";
          instruction->operand;
+
+         if (instruction->instruction[0] != '#' || instruction->instruction[0] != '@' || instruction->instruction[0] != '=')
+         {
+             listing << " ";
+         }
+
+         listing << instruction->operand;
 
         instruction->instructionListingInfo = listing.str();
 
-        /* Potential Deletion
-        listingFile << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "    " <<
-         instruction->label << label_whitespace << "    " <<
-         instruction->instruction << instruction_whitespace << "    " <<
-         instruction->operand << std::endl;
-        // End of Potential Deletion
-        */
-
-         int increment = instruction->reserve_address_bytes();
-        
+        int increment = instruction->reserve_address_bytes();
+    
         
         current_address += increment;
         return current_address;

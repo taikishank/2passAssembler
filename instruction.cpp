@@ -35,7 +35,7 @@ int Instruction::reserve_address_bytes()
             {
                 return 0;
             }
-            else if(instruction == "*"){
+            else if(instruction[0] == '*'){
                 std::cout << "ENTERING * LABEL" << std::endl;
                 if (operand[1] == 'C')
                 {
