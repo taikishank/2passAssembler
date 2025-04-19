@@ -5,11 +5,11 @@
 0006            +LDB     #TABLE2                     69101794
 000A             BASE     TABLE2
 000A    LOOP     ADD      TABLE,X                    1BA017
-000D             ADD      TABLE2,X                   1BE784
+000D             ADD      TABLE2,X                   1BC000
 0010             TIX      COUNT                      2F200E
 0013             JLT      LOOP                       3B2FF4
 0016            +STA     TOTAL                       0F102F04
-001A             RSUB                                4F0000
+001A             RSUB                                
 001D    MYLIT   +LDA     =C'EOF'                     03100000
 0021    COUNT    RESW     1
 0024    TABLE    RESW     2000

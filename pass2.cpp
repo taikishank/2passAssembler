@@ -105,155 +105,243 @@ std::string formatThreeOpcode(Instruction *instr, std::string base){
     e = 0;
     int address = 0;
 
-    if(symbolTable.find(instr->operand) != symbolTable.end()){
-        address = symbolTable[instr->operand] - (instr->address + 3);
-        
-        if (address < -2048 || address > 2047){
-            b = 1;
-            p = 0;
-            address = symbolTable[instr->operand] - symbolTable[base];
-            std::cout << "symbolTable[base] =" << symbolTable[base] << std::endl;
-        }
-        else{
-            b = 0;
-            p = 1;
-            address &= 0xFFF;
-        }
-    }
+    std::string operand = instr->operand;
+    std::string label = operand;
 
-
-    int baseValue = std::stoi(opcodeTable[instr->instruction].first, nullptr, 16);
-    if (instr->instruction[0] == '@')
-    { // Indirect, n = 1
-        n = 1;
-        i = 0;
-        if (base == instr->operand.substr(1, instr->operand.size())){
-            b = 1;
-            p = 0;
-            address = symbolTable[instr->operand.substr(1, instr->operand.size())];
-        }
-    }
-    else if (instr->operand[0] == '#'){ // Immediate, i = 1
+    if (operand[0] == '#'){
         n = 0;
         i = 1;
-        if (base == instr->operand.substr(1, instr->operand.size())){
-            b = 1;
-            p = 0;
-            address = symbolTable[instr->operand.substr(1, instr->operand.size())];
-        }
+        operand = operand.substr(1);
     }
-    else{ // Otherwise, n, i = 1
+    else if (operand[0] == '@'){
+        n = 1;
+        i = 0;
+        operand = operand.substr(1);
+    }
+    else{
         n = 1;
         i = 1;
     }
-    if (base == instr->operand){
-        b = 1;
-        p = 0;
-        address = symbolTable[instr->operand];
+
+    size_t commaPos = operand.find(',');
+    if (commaPos != std::string::npos){
+        x = 1;
+        std::string indexRegister = operand.substr(commaPos + 1);
+        if (indexRegister != "X"){
+            std::cout << "ERROR, invaid usage of INDEXED addressing at :" << indexRegister << std::endl;
+            exit(1);
+        }
+        label = operand.substr(0, commaPos);
+    }
+    else {
+        label = operand;
     }
 
-    // look for ',' indicating indeXed
-    if (instr->operand != "" && instr->operand.find(',') != std::string::npos){    // x
-        x = 1;
-        std::vector<std::string> res;
-        std::stringstream operand_index(instr->operand);
-        std::string token;
-        while (std::getline(operand_index, token, ','))
-        {
-            res.push_back(token);
-        }
-        std::string label = res[0];
+    bool isImmediate = false;
+    try{
+        address = std::stoi(label);
+        isImmediate = true;
+        b = 0; p = 0;
+    }
+    catch (std::invalid_argument &){
+        isImmediate = false;
+    }
 
-        address = symbolTable[res[0]] - registerTable[res[1]];
-
-        if (address < -2048 || address > 2047)
-        {
-            b = 1;
-            p = 0;
+    if (!isImmediate){
+        if(label.empty()){
+            return "";
         }
-        else
-        {
+        if (symbolTable.find(label) == symbolTable.end()) {
+            std::cout << "ERROR: Label '" << label << "' not found in symbol table" << std::endl;
+            exit(1);
+        }
+        int targetAddress = symbolTable[label];
+        int pcDisp = targetAddress - (instr->address + 3);
+        if (pcDisp >= -2048 && pcDisp <= 2047){
             b = 0;
             p = 1;
-            address &= 0xFFF;
-        }
-
-
-        if (symbolTable.find(label) != symbolTable.end()){
-            p = 1;
-            address = symbolTable[label] - (instr->address + 3);
-            address &= 0xFFF;
-        }
-    }
-
-    std::string operand_copy = instr->operand;
-    
-    if (instr->operand.find('@') != std::string::npos)
-        { // Indirect
-        operand_copy.erase(0, 1);
-        try
-        {
-            std::stoi(operand_copy);
-            address = std::stoi(operand_copy);
-        }
-        catch (std::invalid_argument &e)
-        {
-            if (symbolTable.find(instr->instruction) != symbolTable.end()) // If there is a valid label in the symbol table, use that address
-            {
-                address = symbolTable[operand_copy];
-            }
-            else{
-                std::cerr << "Error: Invalid label " << operand_copy << std::endl;
-                return "";
-            }
-        }
-    }
-
-    else if (instr->operand.find('#') != std::string::npos){
-        operand_copy.erase(0, 1);
-        if (symbolTable.find(instr->instruction) != symbolTable.end()) // If there is a valid label in the symbol table, use that address
-        {
-            address = symbolTable[operand_copy];
+            address = pcDisp & 0xFFF;
         }
         else{
-            try{
-                std::stoi(operand_copy);
-                address = std::stoi(operand_copy);
+            int baseDisp = targetAddress - symbolTable[base];
+            if (baseDisp >= 0 && baseDisp <= 4095){
+                b = 1;
+                p = 0;
+                address = baseDisp;
             }
-            catch (std::invalid_argument &e){
-                std::cerr << "Error: Invalid label " << operand_copy << std::endl;
-                return "";
+            else {
+                std::cout << "ERROR: address for " << label << " out of bounds" << std::endl;
+                exit(1);
             }
         }
-        b = 0;
-        p = 0;
     }
+
+    int baseOpcode = std::stoi(opcodeTable[instr->instruction].first, nullptr, 16);
+    int opcode = (baseOpcode & 0xFC) | (n << 1) | i;
+    int flags = (x << 3) | (b << 2) | (p << 1) | e;
+    int byte2 = (flags << 4) | ((address >> 8) & 0x0F);
+    int byte3 = address & 0xFF;
+
+    std::stringstream ss;
+    ss << std::hex << std::uppercase << std::setfill('0');
+    ss << std::setw(2) << opcode;
+    ss << std::setw(2) << byte2;
+    ss << std::setw(2) << byte3;
+
+    return ss.str();
+
+
+    ////////////////////////////////////////////////////
+
+
+    // int baseValue = std::stoi(opcodeTable[instr->instruction].first, nullptr, 16);
+    // if (instr->instruction[0] == '@')
+    // { // Indirect, n = 1
+    //     n = 1;
+    //     i = 0;
+    //     if (base == instr->operand.substr(1, instr->operand.size())){
+    //         b = 1;
+    //         p = 0;
+    //         address = symbolTable[instr->operand.substr(1, instr->operand.size())];
+    //     }
+    // }
+    // else if (instr->operand[0] == '#'){ // Immediate, i = 1
+    //     n = 0;
+    //     i = 1;
+    //     if (base == instr->operand.substr(1, instr->operand.size())){
+    //         b = 1;
+    //         p = 0;
+    //         address = symbolTable[instr->operand.substr(1, instr->operand.size())];
+    //     }
+    // }
+    // else{ // Otherwise, n, i = 1
+    //     n = 1;
+    //     i = 1;
+    // }
+    // if (base == instr->operand){
+    //     b = 1;
+    //     p = 0;
+    //     address = symbolTable[instr->operand];
+    // }
+
+    // // look for ',' indicating indeXed
+    // if (instr->operand != "" && instr->operand.find(',') != std::string::npos){    // x
+    //     x = 1;
+    //     std::vector<std::string> res;
+    //     std::stringstream operand_index(instr->operand);
+    //     std::string token;
+    //     while (std::getline(operand_index, token, ','))
+    //     {
+    //         res.push_back(token);
+    //     }
+    //     std::string label = res[0];
+
+    //     address = symbolTable[res[0]] - registerTable[res[1]];
+
+    //     if (address < -2048 || address > 2047)
+    //     {
+    //         b = 1;
+    //         p = 0;
+    //     }
+    //     else
+    //     {
+    //         b = 0;
+    //         p = 1;
+    //         address &= 0xFFF;
+    //     }
+
+
+    //     if (symbolTable.find(label) != symbolTable.end()){
+    //         p = 1;
+    //         address = symbolTable[label] - (instr->address + 3);
+    //         address &= 0xFFF;
+    //     }
+    // }
+
+    // std::string operand_copy = instr->operand;
+    
+    // if (instr->operand.find('@') != std::string::npos)
+    //     { // Indirect
+    //     operand_copy.erase(0, 1);
+    //     try
+    //     {
+    //         std::stoi(operand_copy);
+    //         address = std::stoi(operand_copy);
+    //     }
+    //     catch (std::invalid_argument &e)
+    //     {
+    //         if (symbolTable.find(instr->instruction) != symbolTable.end()) // If there is a valid label in the symbol table, use that address
+    //         {
+    //             address = symbolTable[operand_copy];
+    //         }
+    //         else{
+    //             std::cerr << "Error: Invalid label " << operand_copy << std::endl;
+    //             return "";
+    //         }
+    //     }
+    // }
+
+    // else if (instr->operand.find('#') != std::string::npos){
+    //     operand_copy.erase(0, 1);
+    //     if (symbolTable.find(instr->instruction) != symbolTable.end()) // If there is a valid label in the symbol table, use that address
+    //     {
+    //         address = symbolTable[operand_copy];
+    //     }
+    //     else{
+    //         try{
+    //             std::stoi(operand_copy);
+    //             address = std::stoi(operand_copy);
+    //         }
+    //         catch (std::invalid_argument &e){
+    //             std::cerr << "Error: Invalid label " << operand_copy << std::endl;
+    //             return "";
+    //         }
+    //     }
+    //     b = 0;
+    //     p = 0;
+    // }
+
+    // if(symbolTable.find(instr->operand) != symbolTable.end()){
+    //     address = symbolTable[instr->operand] - (instr->address + 3);
+        
+    //     if (address < -2048 || address > 2047){
+    //         b = 1;
+    //         p = 0;
+    //         address = symbolTable[instr->operand] - symbolTable[base];
+    //         std::cout << "symbolTable[base] =" << symbolTable[base] << std::endl;
+    //     }
+    //     else{
+    //         b = 0;
+    //         p = 1;
+    //         address &= 0xFFF;
+    //     }
+    // }
         
     
         
-    //std::cout << instr->instruction << std::endl;
-    //std::cout << "Disp: " << std::hex << address << std::endl;
+    // //std::cout << instr->instruction << std::endl;
+    // //std::cout << "Disp: " << std::hex << address << std::endl;
 
-    std::stringstream ss;
-    ss << std::hex << std::setfill('0'); // pad with 0s
+    // std::stringstream ss;
+    // ss << std::hex << std::setfill('0'); // pad with 0s
 
-    int opcode = (baseValue & 0xFC) | (n << 1) | i;
-    ss << std::setw(2) << std::uppercase << opcode;
+    // int opcode = (baseValue & 0xFC) | (n << 1) | i;
+    // ss << std::setw(2) << std::uppercase << opcode;
 
-    int flags = (x << 3) | (b << 2) | (p << 1) | e;
-    int byte2 = (flags << 4) | ((address >> 8) & 0x0F);
-    ss << std::setw(2) << std::uppercase << byte2;
+    // int flags = (x << 3) | (b << 2) | (p << 1) | e;
+    // int byte2 = (flags << 4) | ((address >> 8) & 0x0F);
+    // ss << std::setw(2) << std::uppercase << byte2;
 
-    int byte3 = address & 0xFF;
-    ss << std::setw(2) << std::uppercase << byte3;
+    // int byte3 = address & 0xFF;
+    // ss << std::setw(2) << std::uppercase << byte3;
 
-    //std:: cout << baseValue << std::endl;
-    //std::cout << instr->instruction << " nixbpe: " << n << " " << i << " " << x << " " << b << " " << p << " " << e << " " << std::endl;
+    // //std:: cout << baseValue << std::endl;
+    // //std::cout << instr->instruction << " nixbpe: " << n << " " << i << " " << x << " " << b << " " << p << " " << e << " " << std::endl;
 
-    //std::cout << ss.str() << std::endl;
-    //std::cout << "" << std::endl;
+    // //std::cout << ss.str() << std::endl;
+    // //std::cout << "" << std::endl;
 
-    return ss.str();
+    // return ss.str();
 }
 std::string formatFourOpcode(Instruction *instr)
 {

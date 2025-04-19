@@ -1,7 +1,6 @@
 # 2passAssembler
 CS530 A2 Project
 
-- BASE relative addressing in F3 (taiki) / alejandro
 - C'EOF' 
     - 0 padding in length at the beginning (alejandro)
 - Renaming files (remove .SIC) (implement function)
