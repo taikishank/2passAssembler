@@ -2,14 +2,9 @@
 CS530 A2 Project
 
 - STARTING ADDRESS FROM FIRST LINE (START)
-- C'EOF' 
-    - 0 padding in length at the beginning (alejandro)
+- BYTE 
 - Renaming files (remove .SIC) (implement function)
-- Formatting Operand column (alejandro)
-    - #, @ get one less space (alejandro)
 - Add comments (both)
-
-- create a larger .sic file to test (alejandro)
 
 (both)
 EVERY FILE SHOULD CONTAINS:

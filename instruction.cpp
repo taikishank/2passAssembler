@@ -20,7 +20,6 @@ int Instruction::reserve_address_bytes()
     }
     else{
         if (assembler_directives.find(instruction) != assembler_directives.end()){
-            std::cout << "Entering assmebler directive check for: " << instruction << std::endl;
             if (instruction == "RESB") {
                 return stoi(operand);
             }
@@ -39,12 +38,12 @@ int Instruction::reserve_address_bytes()
                 std::cout << "ENTERING * LABEL" << std::endl;
                 if (operand[1] == 'C')
                 {
-                    std::cout << "Instruction size: " << operand.size() - 4 << std::endl;
+                    //std::cout << "Instruction size: " << operand.size() - 4 << std::endl;
                     return operand.size() - 4; // CONFIRM THIS IS TRUE OR NOT
                 }
                 else if (operand[1] == 'X')
                 {
-                    std::cout << "Instruction size: " << (operand.size() - 4) / 2 << std::endl;
+                    //std::cout << "Instruction size: " << (operand.size() - 4) / 2 << std::endl;
                     return (operand.size() - 4) / 2; // CONFIRM THIS IS TRUE OR NOT
                 }
             }

@@ -14,6 +14,11 @@ void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionLi
 {
     std::string base = "";
 
+    for (const auto &[key, value] : symbolTable)
+    {
+        std::cout << key << ": " << value << std::endl;
+    }
+
     for(int i = 0; i < instructionList.size(); i++){
         Instruction *instr = instructionList[i];
         if(instr->instruction == "."){
@@ -34,21 +39,43 @@ void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionLi
             listingFile <<  instr->instructionListingInfo << std::endl;
             continue;
         }
+        if (instr->instruction[0] == '*')
+        {
+            std::string op = instr->operand.substr(3, instr->operand.size() - 4);
+            int object_code_padding = std::max(0, 34 - (int)instr->instructionListingInfo.length()); // Change to 34
+            std::string object_code_whitespace(object_code_padding, ' ');
+            std::string white_space = "                 ";
+
+            if (instr->operand[1] == 'C')
+            {
+                listingFile << instr->instructionListingInfo << object_code_whitespace << white_space;
+                for (char c : op)
+                {
+                    listingFile << std::hex << std::uppercase << static_cast<int>(c);
+                }
+                listingFile << std::endl;
+            }
+            else
+            {
+                listingFile << instr->instructionListingInfo << object_code_whitespace << white_space << op << std::endl;
+            }
+            continue;
+        }
         if (assembler_directives.find(instr->instruction) != assembler_directives.end())
         {
             // Do something with assembler directives
             listingFile << instr->instructionListingInfo << std::endl;
         }
-        else{ 
-            std::cout << "Instruction: " << instr->instruction << std::endl;
-            
-            std::cout << "Instruction Listing Info: " << instr->instructionListingInfo << std::endl;
+        else{
             std::cout << std::endl;
+            std::cout << "Instruction: " << instr->instruction << std::endl;
+            std::cout << "Instruction Listing Info: " << instr->instructionListingInfo << std::endl;
+            
 
-            int object_code_padding = std::max(0, 36 - (int)instr->instructionListingInfo.length()); // Change to 34
+            int object_code_padding = std::max(0, 34 - (int)instr->instructionListingInfo.length()); // Change to 34
             std::string object_code_whitespace(object_code_padding, ' ');
             std::string white_space = "                 ";
-
+            
             if (opcodeTable[instr->instruction].second == 1)
             {
                 listingFile << instr->instructionListingInfo << object_code_whitespace << white_space << formatOneOpcode(instr) << std::endl;
@@ -118,6 +145,14 @@ std::string formatThreeOpcode(Instruction *instr, std::string base){
     std::string operand = instr->operand;
     std::string label = operand;
 
+    if (instr->instruction == "RSUB")
+    {
+        int opcode = (std::stoi(opcodeTable["RSUB"].first, nullptr, 16) & 0xFC) | 0x03;
+        std::stringstream ss;
+        ss << std::hex << std::uppercase << std::setfill('0');
+        ss << std::setw(2) << opcode << "0000";
+        return ss.str();
+    }
     if (operand[0] == '#'){
         n = 0;
         i = 1;
@@ -177,9 +212,14 @@ std::string formatThreeOpcode(Instruction *instr, std::string base){
             std::cout << "ERROR: Label '" << label << "' not found in symbol table" << std::endl;
             exit(1);   
         }
-        if(!isLiteral)
+        if(!isLiteral){
             targetAddress = symbolTable[label];
+        }
         int pcDisp = targetAddress - (instr->address + 3);
+
+        std::cout << "ADDRESSING INFO" << instr->instruction << " " << std::hex << std::uppercase << instr->label
+                  << " " << std::hex << std::uppercase << targetAddress << " " << 
+                  (instr->address + 3) << " " << pcDisp << std::endl;
         if (pcDisp >= -2048 && pcDisp <= 2047){
             b = 0;
             p = 1;
@@ -264,6 +304,7 @@ std::string formatFourOpcode(Instruction *instr)
 
         address = symbolTable[res[0]];
     }
+    
 
     std::string operand_copy = operand;
 

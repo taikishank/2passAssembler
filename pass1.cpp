@@ -93,7 +93,7 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
                              << op << label_whitespace << "    " << 
                              instr->address << "     " << length;
 
-                symbolTable[op] = address;
+                
             }
             else{ // 'C'
                 std::string op = instr->operand.substr(3, (instr->operand.size() - 4));
@@ -110,8 +110,6 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
                 {
                     literalTable << std::hex << std::uppercase << static_cast<int>(c);
                 }
-
-                symbolTable[op] = address;
 
                 literalTable <<  operand_whitespace << "    " << 
                 instr->address << "     " << length << std::endl;
@@ -185,7 +183,7 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
 {
     if (!listingFile)
     {
-        std::cout << "Listing file is not open! Open that up!" << std::endl;
+        std::cout << "Listing file is not open! Open up!" << std::endl;
         return -1;
     }
     if(instruction->instruction == "END")
@@ -193,18 +191,28 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
         
         std::stringstream listing;
 
-        listing << "                 " + instruction->instruction + "       " + instruction->operand;
+        listing << "                 " + instruction->instruction + "      " + instruction->operand;
         instruction->instructionListingInfo = listing.str();
 
         return current_address;
     }
-    if(instruction->label == "*"){
+    if (instruction->instruction[0] == '*' && instruction->operand[0] == '=')
+    {
+        int label_padding = std::max(0, 6 - (int)instruction->label.length());
+        std::string label_whitespace(label_padding, ' ');
+        int instruction_padding = std::max(0, 6 - (int)instruction->instruction.length());
+        std::string instruction_whitespace(instruction_padding, ' ');
         std::stringstream listing;
-        listing << "                  " + instruction->instruction + "      " + instruction->operand;
-        
-        instruction->instructionListingInfo = listing.str(); 
 
-        return current_address + (instruction->instruction.size() - 4); // CONFIRM THIS IS TRUE OR NOT
+        listing << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << instruction->address << "    " <<
+         instruction->instruction << label_whitespace << " " << instruction->operand;
+        instruction->instructionListingInfo = listing.str();
+
+        std::string op = instruction->operand.substr(3, instruction->operand.size() - 4);
+        symbolTable[op] = current_address;
+        
+
+        return current_address + (instruction->operand.size() - 4); // CONFIRM THIS IS TRUE OR NOT
     }
 
     if (!instruction->label.empty() || !instruction->instruction.empty())
