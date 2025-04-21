@@ -61,7 +61,7 @@ int Instruction::reserve_address_bytes()
             }
         }
         else{
-            std::cout << "ERROR: Instruction not found in symbol table" << std::endl;
+            std::cout << "ERROR: Instruction" << instruction << "not found in symbol table" << std::endl;
             exit(0);
             return -1;
         }

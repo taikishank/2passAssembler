@@ -65,7 +65,6 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
         }
         else if (words.size() == 3)
         { // Update symbol table here
-            //std::cout << 3 << "    " << line << std::endl;
             instr = new Instruction(words[0], words[1], words[2], address);
             address = writeToListing(instr, address, listingFile);
             instruction_list.push_back(instr);
@@ -77,10 +76,7 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
             std::cout << "ERROR: Invalid input format. Line must contain either 2 or 3 words" << std::endl;
             exit(-1);
         }
-        //std::cout << address << "    " << line << std::endl;
-
-        //std::cout << "instr->instruction[0]" << instr->instruction[0] << std::endl;
-
+        
         if (instr->instruction[0] == '*' && instr->operand[0] == '='){
             
             if (instr->operand[1] == 'X'){
@@ -96,6 +92,8 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
                 literalTable << op << name_whitespace << "   "
                              << op << label_whitespace << "    " << 
                              instr->address << "     " << length;
+
+                symbolTable[op] = address;
             }
             else{ // 'C'
                 std::string op = instr->operand.substr(3, (instr->operand.size() - 4));
@@ -112,7 +110,9 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
                 {
                     literalTable << std::hex << std::uppercase << static_cast<int>(c);
                 }
-                
+
+                symbolTable[op] = address;
+
                 literalTable <<  operand_whitespace << "    " << 
                 instr->address << "     " << length << std::endl;
             }
@@ -193,7 +193,7 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
         
         std::stringstream listing;
 
-        listing << "                  " + instruction->instruction + "       " + instruction->operand;
+        listing << "                 " + instruction->instruction + "       " + instruction->operand;
         instruction->instructionListingInfo = listing.str();
 
         return current_address;
@@ -228,7 +228,12 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
         listing << instruction->instruction << instruction_whitespace << "  ";
          instruction->operand;
 
-         if (instruction->instruction[0] != '#' || instruction->instruction[0] != '@' || instruction->instruction[0] != '=')
+         if (instruction->instruction[0] == '+')
+         {
+             listing << " ";
+         }
+
+         if (instruction->operand[0] != '#' && instruction->operand[0] != '@' && instruction->operand[0] != '=')
          {
              listing << " ";
          }

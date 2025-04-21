@@ -1,6 +1,7 @@
 # 2passAssembler
 CS530 A2 Project
 
+- STARTING ADDRESS FROM FIRST LINE (START)
 - C'EOF' 
     - 0 padding in length at the beginning (alejandro)
 - Renaming files (remove .SIC) (implement function)
