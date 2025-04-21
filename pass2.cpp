@@ -39,6 +39,29 @@ void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionLi
             listingFile <<  instr->instructionListingInfo << std::endl;
             continue;
         }
+        if (instr->instruction == "BYTE")
+        {
+            listingFile << instr->instructionListingInfo;
+            std::string op = instr->operand.substr(2, instr->operand.size() - 3);
+            int object_code_padding = std::max(0, 34 - (int)instr->instructionListingInfo.length()); // Change to 34
+            std::string object_code_whitespace(object_code_padding, ' ');
+            std::string white_space = "                 ";
+            if (instr->operand[1] == 'C')
+            {
+                listingFile <<  object_code_whitespace << white_space;
+                for (char c : op)
+                {
+                    listingFile << std::hex << std::uppercase << static_cast<int>(c);
+                }
+                listingFile << std::endl;
+            }
+            else
+            {
+                listingFile << object_code_whitespace << white_space << op << std::endl;
+            }
+
+            continue;
+        }
         if (instr->instruction[0] == '*')
         {
             std::string op = instr->operand.substr(3, instr->operand.size() - 4);
@@ -276,12 +299,12 @@ std::string formatFourOpcode(Instruction *instr)
     if (instr->instruction[0] == '@'){ // Indirect, n = 1
         n = 1;
         i = 0;
-        address = symbolTable[operand.substr(1, operand.size())];
+        address = symbolTable[operand.substr(1)];
     }
     else if (operand[0] == '#'){ // Immediate, i = 1
         n = 0;
         i = 1;
-        address = symbolTable[operand.substr(1, operand.size())];
+        address = symbolTable[operand.substr(1)];
     }
     else{ // Otherwise, n, i = 1
         n = 1;

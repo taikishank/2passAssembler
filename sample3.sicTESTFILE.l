@@ -38,7 +38,7 @@
 1053             JLT      RLOOP                    3B2FEA
 1056    EXIT     STX      LENGTH                   134000
 1059             RSUB                              4F0000
-105C    INPUT    BYTE     X'F1'
+105C    INPUT    BYTE     X'F1'                    F1
 .        .
 .        SUBROUTINE TO WRITE RECORD
 .        .
