@@ -1,3 +1,9 @@
+//Alejandro Pacheco, Taiki Shank
+//cssc0803, cssc5097
+//CS530, Spring 2025
+//Assignment #2, Two-Pass Assembler
+//instruction.h
+
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 
@@ -19,9 +25,6 @@ public:
 
     // Constructor
     Instruction(std::string lbl = "", std::string opc = "", std::string opr = "", int address = -1);
-
-    // Function to write to a listing file
-    void writeToListing(int address, std::ofstream &listingFile);
 
     int reserve_address_bytes();
 };

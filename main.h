@@ -1,9 +1,8 @@
-// Alejandro Pacheco
-// Red ID: 827078376
-// Edoras account: cssc0803@edoras.sdsu.edu
-// CS 530, Spring 2025
-// Assignment #2, Sic-XE Disassembler
-// main.h
+//Alejandro Pacheco, Taiki Shank
+//cssc0803, cssc5097
+//CS530, Spring 2025
+//Assignment #2, Two-Pass Assembler
+//main.h
 
 #ifndef MAIN_H
 #define MAIN_H
@@ -24,6 +23,6 @@
 #define ERROR_RETURN_CODE (-1) // Exit statement for errors
 #define RETURN_CODE 0          // Exit statement constant
 
-std::string getFileName(std::string);
+std::string getFileName(std::string); // Function to remove .sic from file path
 
 #endif // MAIN_H

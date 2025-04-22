@@ -1,3 +1,9 @@
+//Alejandro Pacheco, Taiki Shank
+//cssc0803, cssc5097
+//CS530, Spring 2025
+//Assignment #2, Two-Pass Assembler
+//pass2.h
+
 #ifndef PASS2_H
 #define PASS2_H
 

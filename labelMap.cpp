@@ -1,11 +1,19 @@
-#include "labelMap.h"
-#include <set>
+//Alejandro Pacheco, Taiki Shank
+//cssc0803, cssc5097
+//CS530, Spring 2025
+//Assignment #2, Two-Pass Assembler
+//labelMap.cpp
 
+
+#include "labelMap.h"
+
+// This is the assembler directive set!
 std::set <std::string> assembler_directives = {
     "START", "END", "RESB", "RESW", "BYTE", "WORD", "BASE", "NOBASE",
     "*", "LTORG", "ORG", "EQU", "USE", "CSECT", "EXTDEF", "EXTREF"
 };
 
+// maintains map for registers
 std::map<std::string, int> registerTable = {
     {"A", 0},
     {"X", 1},
@@ -17,7 +25,11 @@ std::map<std::string, int> registerTable = {
     {"PC", 8},
     {"SW", 9}
 };
+
+// empty SYMTAB to be filled in as files are parsed through
 std::map<std::string, int> symbolTable = {}; 
+
+// maintains map for opcode table
 std::map<std::string, std::pair<std::string, int>> opcodeTable = { 
     {"ADD", {"18", 3}},
     {"+ADD", {"18", 4}},

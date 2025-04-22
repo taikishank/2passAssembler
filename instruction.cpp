@@ -1,10 +1,25 @@
+//Alejandro Pacheco, Taiki Shank
+//cssc0803, cssc5097
+//CS530, Spring 2025
+//Assignment #2, Two-Pass Assembler
+//instruction.cpp
+
 #include "instruction.h"
 #include "labelMap.h"
 
-// Constructor
+/*
+This file contains a constructor for the instruction, which represents an individual line in the 
+.sic file. It also contains a function that will calculate the total number of bits (space) that the 
+instruction takes.
+*/
+
+
+// Constructor for instruction
 Instruction::Instruction(std::string lbl, std::string instr, std::string opd, int addr)
     : label(lbl), instruction(instr), operand(opd), address(addr) {}
 
+
+// Funciton to reserve bytes based on format, assembler directives    
 int Instruction::reserve_address_bytes()
 {
     if (opcodeTable.find(instruction) != opcodeTable.end())
@@ -38,13 +53,11 @@ int Instruction::reserve_address_bytes()
                 std::cout << "ENTERING * LABEL" << std::endl;
                 if (operand[1] == 'C')
                 {
-                    //std::cout << "Instruction size: " << operand.size() - 4 << std::endl;
-                    return operand.size() - 4; // CONFIRM THIS IS TRUE OR NOT
+                    return operand.size() - 4; 
                 }
                 else if (operand[1] == 'X')
                 {
-                    //std::cout << "Instruction size: " << (operand.size() - 4) / 2 << std::endl;
-                    return (operand.size() - 4) / 2; // CONFIRM THIS IS TRUE OR NOT
+                    return (operand.size() - 4) / 2; 
                 }
             }
             else if (instruction == "BYTE") {
@@ -58,6 +71,7 @@ int Instruction::reserve_address_bytes()
             else{
                 return 0;
             }
+            return 0;
         }
         else{
             std::cout << "ERROR: Instruction" << instruction << "not found in symbol table" << std::endl;

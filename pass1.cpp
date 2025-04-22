@@ -1,3 +1,9 @@
+//Alejandro Pacheco, Taiki Shank
+//cssc0803, cssc5097
+//CS530, Spring 2025
+//Assignment #2, Two-Pass Assembler
+//pass1.cpp
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -22,7 +28,7 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
     
     literalTable << "\nLiteral Table\nName  Operand   Address  Length:\n--------------------------------\n";
 
-    int address = 0; // we have to update this with the first instruction (START)
+    int address = 0;
 
     std::string line;
     std::vector<Instruction *> instruction_list;
@@ -65,7 +71,7 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
             instruction_list.push_back(instr);
         }
         else if (words.size() == 3)
-        { // Update symbol table here
+        { 
             instr = new Instruction(words[0], words[1], words[2], address);
             address = writeToListing(instr, address, listingFile);
             instruction_list.push_back(instr);
@@ -121,8 +127,6 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
     Instruction* last = instruction_list.back();
     int size = last->address;
 
-    std::cout << "Last Instruction Info: " << last->instructionListingInfo << last->address << std::endl;
-
     std::ofstream symbol_table_file = initialize_symbol_table(filename);
 
     for( Instruction* instr: label_list){
@@ -163,8 +167,9 @@ void generateSymbolTable(Instruction *instr, int size, std::ofstream &listingFil
             listingFile << instr->label << label_whitespace << "  "
                 << "      "
                 << "  "
-                << std::hex << std::setw(6) << std::setfill('0') << std::uppercase << instr->address
+                << std::setw(6) << std::setfill('0') << std::hex << std::uppercase << instr->address
                 << "  " << size << "  " << std::endl;
+
     }
     else{
         int label_padding = std::max(0, 6 - (int)instr->label.length());
@@ -254,7 +259,6 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
         }
 
         listing << instruction->instruction << instruction_whitespace << "  ";
-         instruction->operand;
 
          if (instruction->instruction[0] == '+')
          {

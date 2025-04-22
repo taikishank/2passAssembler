@@ -1,3 +1,9 @@
+# Alejandro Pacheco, Taiki Shank
+# cssc0803, cssc5097
+# CS530, Spring 2025
+# Assignment #2, Two-Pass Assembler
+# Makefile
+
 # Specify compiler
 CC = g++
 # Compiler flags, if you want debug info, add -g

@@ -1,3 +1,9 @@
+//Alejandro Pacheco, Taiki Shank
+//cssc0803, cssc5097
+//CS530, Spring 2025
+//Assignment #2, Two-Pass Assembler
+//pass2.cpp
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -14,12 +20,7 @@ void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionLi
 {
     std::string base = "";
 
-    for (const auto &[key, value] : symbolTable)
-    {
-        std::cout << key << ": " << value << std::endl;
-    }
-
-    for(int i = 0; i < instructionList.size(); i++){
+    for(long unsigned int i = 0; i < instructionList.size(); i++){
         Instruction *instr = instructionList[i];
         if(instr->instruction == "."){
             listingFile << instr->instructionListingInfo << std::endl;
@@ -37,6 +38,9 @@ void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionLi
         }
         if(instr->instruction == "END"){
             listingFile <<  instr->instructionListingInfo;
+            if (i < instructionList.size() - 1){
+                listingFile << std::endl;
+            }
             continue;
         }
         if (instr->instruction == "BYTE")
@@ -90,11 +94,6 @@ void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionLi
             listingFile << instr->instructionListingInfo << std::endl;
         }
         else{
-            std::cout << std::endl;
-            std::cout << "Instruction: " << instr->instruction << std::endl;
-            std::cout << "Instruction Listing Info: " << instr->instructionListingInfo << std::endl;
-            
-
             int object_code_padding = std::max(0, 34 - (int)instr->instructionListingInfo.length()); // Change to 34
             std::string object_code_whitespace(object_code_padding, ' ');
             std::string white_space = "                 ";
@@ -239,10 +238,6 @@ std::string formatThreeOpcode(Instruction *instr, std::string base){
             targetAddress = symbolTable[label];
         }
         int pcDisp = targetAddress - (instr->address + 3);
-
-        std::cout << "ADDRESSING INFO" << instr->instruction << " " << std::hex << std::uppercase << instr->label
-                  << " " << std::hex << std::uppercase << targetAddress << " " << 
-                  (instr->address + 3) << " " << pcDisp << std::endl;
         if (pcDisp >= -2048 && pcDisp <= 2047){
             b = 0;
             p = 1;
@@ -290,8 +285,7 @@ std::string formatFourOpcode(Instruction *instr)
     std::stringstream ss;
     ss << std::hex << std::setfill('0'); // pad with 0s
 
-    int baseValue = std::stoi(opcodeTable[instr->instruction].first, nullptr, 16); // may need to move
-    std::cout << instr->instruction << "  " << baseValue << std::endl;
+    int baseValue = std::stoi(opcodeTable[instr->instruction].first, nullptr, 16); 
 
     std::string operand = instr->operand;
     std::string label = operand;
@@ -357,7 +351,6 @@ std::string formatFourOpcode(Instruction *instr)
                 exit(1);
             }
             targetAddress = symbolTable[op];
-            std::cout << op << targetAddress << "AHAAAAAAAAAAAAAAAA" << std::endl;
             isLiteral = true;
         }
         else if (symbolTable.find(label) == symbolTable.end()) {
