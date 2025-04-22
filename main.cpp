@@ -31,8 +31,8 @@ int main(int argc, char **argv)
     for (std::string curr_file : file_paths)
     {
         std::stringstream listing_file_name;
-        // file_name = getFileName(curr_file); // TODO: Implement this function to get the file name from the path
-        listing_file_name << curr_file << "TESTFILE.l"; // REMOVE TESTFILE LATER 
+        std::string file_name = getFileName(curr_file); // TODO: Implement this function to get the file name from the path
+        listing_file_name << file_name << ".l"; // REMOVE TESTFILE LATER 
         std::string listing_file = listing_file_name.str();
         std::ofstream listingFile(listing_file);
         if (!listingFile)
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
             return ERROR_RETURN_CODE;
         }
         std::cout<<"Reading file: " << curr_file << std::endl;
-        std::vector<Instruction *> instrList = pass1(file_paths[0], listingFile); // PASS ONE
+        std::vector<Instruction *> instrList = pass1(curr_file, listingFile); // PASS ONE
 
         pass2(listingFile, instrList); // PASS TWO
 
@@ -60,8 +60,7 @@ int main(int argc, char **argv)
 }
 
 
-// IMPLEMENT THIS FUNCTION TO GET THE FILE NAME FROM THE PATH
-std::string getFileName(std::string){
-    return "";
-
+std::string getFileName(std::string f){
+    std::string file = f.substr(0, f.length() - 4);
+    return file;
 }

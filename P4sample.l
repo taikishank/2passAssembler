@@ -10,7 +10,7 @@
 0013             JLT      LOOP                     3B2FF4
 0016            +STA      TOTAL                    0F102F04
 001A             RSUB                              4F0000
-001D    MYLIT   +LDA     =C'EOF'                   03100000
+001D    MYLIT   +LDA     =C'EOF'                   03102F07
 0021    COUNT    RESW     1
 0024    TABLE    RESW     2000
 1794    TABLE2   RESW     2000

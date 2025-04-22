@@ -28,7 +28,7 @@ int Instruction::reserve_address_bytes()
             }
             else if (instruction == "START")
             {
-                return 0; // Change to the actual start address
+                return std::stoi(operand, nullptr, 16);
             }
             else if (instruction == "END")
             {

@@ -1,5 +1,5 @@
 .  SOURCE CODE FOR THE XE VERSION OF THE SIC FAMILY OF COMPUTER
-0000    SUM      START    0                        
+0000    SUM      START    1000                        
 0000    FIRST    LDX     #0                        050000
 0003             LDA     #0                        010000
 0006            +LDB     #TABLE2                   69101794

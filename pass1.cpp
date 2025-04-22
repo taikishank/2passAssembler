@@ -7,6 +7,7 @@
 #include "pass1.h"
 #include <iomanip>
 #include "labelMap.h"
+#include "main.h"
 
 std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &listingFile)
 {
@@ -90,8 +91,8 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
                 std::string label_whitespace(operand_padding, ' ');
 
                 literalTable << op << name_whitespace << "   "
-                             << op << label_whitespace << "    " << 
-                             instr->address << "     " << length;
+                             << op << label_whitespace << "    " << std::hex << std::setw(4) << std::setfill('0') <<
+                             instr->address << "     " << length << std::endl;
 
                 
             }
@@ -111,7 +112,7 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
                     literalTable << std::hex << std::uppercase << static_cast<int>(c);
                 }
 
-                literalTable <<  operand_whitespace << "    " << 
+                literalTable <<  operand_whitespace << "    " << std::hex << std::setw(4) << std::setfill('0') <<
                 instr->address << "     " << length << std::endl;
             }
         }
@@ -122,7 +123,6 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
 
     std::cout << "Last Instruction Info: " << last->instructionListingInfo << last->address << std::endl;
 
-    
     std::ofstream symbol_table_file = initialize_symbol_table(filename);
 
     for( Instruction* instr: label_list){
@@ -138,8 +138,8 @@ std::vector<Instruction *> pass1(const std::string &filename, std::ofstream &lis
 std::ofstream initialize_symbol_table(const std::string &filename)
 {
     std::stringstream listing_file_name;
-    // file_name = getFileName(curr_file); // TODO: Implement this function to get the file name from the path
-    listing_file_name << filename << "TESTFILE.st"; // REMOVE TESTFILE LATER
+    std::string stripped_file_name = getFileName(filename); // TODO: Implement this function to get the file name from the path
+    listing_file_name << stripped_file_name << ".st";       // REMOVE TESTFILE LATER
     std::string listing_file = listing_file_name.str();
     std::ofstream listingFile(listing_file);
     if (!listingFile)
@@ -186,9 +186,28 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
         std::cout << "Listing file is not open! Open up!" << std::endl;
         return -1;
     }
+    if (instruction->instruction == "START")
+    {
+        std::stringstream listing;
+
+        int startingAddress = instruction->reserve_address_bytes();
+
+        int label_padding = std::max(0, 6 - (int)instruction->label.length());
+        std::string label_whitespace(label_padding, ' ');
+        int instruction_padding = std::max(0, 6 - (int)instruction->instruction.length());
+        std::string instruction_whitespace(instruction_padding, ' ');
+
+
+        listing << std::hex << std::setw(4) << std::setfill('0') << std::uppercase << startingAddress << "    " << instruction->label << label_whitespace << "   ";
+
+        listing << instruction->instruction << instruction_whitespace << "   " << instruction->operand;
+
+        instruction->instructionListingInfo = listing.str();
+
+        return startingAddress;
+    }
     if(instruction->instruction == "END")
     {
-        
         std::stringstream listing;
 
         listing << "                 " + instruction->instruction + "      " + instruction->operand;
@@ -196,6 +215,7 @@ int writeToListing(Instruction *instruction, int current_address, std::ofstream 
 
         return current_address;
     }
+    
     if (instruction->instruction[0] == '*' && instruction->operand[0] == '=')
     {
         int label_padding = std::max(0, 6 - (int)instruction->label.length());

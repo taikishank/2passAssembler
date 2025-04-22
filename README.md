@@ -2,9 +2,9 @@
 CS530 A2 Project
 
 - STARTING ADDRESS FROM FIRST LINE (START)
-- BYTE 
 - Renaming files (remove .SIC) (implement function)
 - Add comments (both)
+- Literal Table formatting
 
 (both)
 EVERY FILE SHOULD CONTAINS:

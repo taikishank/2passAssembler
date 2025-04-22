@@ -36,7 +36,7 @@ void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionLi
             continue;
         }
         if(instr->instruction == "END"){
-            listingFile <<  instr->instructionListingInfo << std::endl;
+            listingFile <<  instr->instructionListingInfo;
             continue;
         }
         if (instr->instruction == "BYTE")
@@ -294,17 +294,20 @@ std::string formatFourOpcode(Instruction *instr)
     std::cout << instr->instruction << "  " << baseValue << std::endl;
 
     std::string operand = instr->operand;
+    std::string label = operand;
     int address = 0;
 
     if (instr->instruction[0] == '@'){ // Indirect, n = 1
         n = 1;
         i = 0;
         address = symbolTable[operand.substr(1)];
+        label = operand.substr(1);
     }
     else if (operand[0] == '#'){ // Immediate, i = 1
         n = 0;
         i = 1;
         address = symbolTable[operand.substr(1)];
+        label = operand.substr(1);
     }
     else{ // Otherwise, n, i = 1
         n = 1;
@@ -327,7 +330,44 @@ std::string formatFourOpcode(Instruction *instr)
 
         address = symbolTable[res[0]];
     }
-    
+
+    bool isImmediate = false;
+    try{
+        address = std::stoi(label);
+        isImmediate = true;
+        b = 0; p = 0;
+    }
+    catch (std::invalid_argument &){
+        isImmediate = false;
+    }
+    int targetAddress;
+    if (!isImmediate){
+        if(label.empty()){
+            return "";
+        }
+        
+        bool isLiteral = false;
+
+        if(label.size() > 4 && label[0] == '='){
+            std::string op = instr->operand.substr(3, (instr->operand.size() - 4));
+            
+            if (symbolTable.find(op) == symbolTable.end())
+            {
+                std::cout << "ERROR: Label '" << label << "' not found in symbol table" << std::endl;
+                exit(1);
+            }
+            targetAddress = symbolTable[op];
+            std::cout << op << targetAddress << "AHAAAAAAAAAAAAAAAA" << std::endl;
+            isLiteral = true;
+        }
+        else if (symbolTable.find(label) == symbolTable.end()) {
+            std::cout << "ERROR: Label '" << label << "' not found in symbol table" << std::endl;
+            exit(1);   
+        }
+        if(!isLiteral){
+            targetAddress = symbolTable[label];
+        }        
+    }
 
     std::string operand_copy = operand;
 
@@ -336,7 +376,7 @@ std::string formatFourOpcode(Instruction *instr)
 
     int flags = (x << 3) | (b << 2) | (p << 1) | e; 
     ss << std::setw(1) << std::hex << flags;
-    ss << std::setw(5) << std::setfill('0') << std::hex << (address & 0xFFFFF);
+    ss << std::setw(5) << std::setfill('0') << std::hex << (targetAddress & 0xFFFFF);
 
     return ss.str();
 }

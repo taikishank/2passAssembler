@@ -24,4 +24,6 @@
 #define ERROR_RETURN_CODE (-1) // Exit statement for errors
 #define RETURN_CODE 0          // Exit statement constant
 
+std::string getFileName(std::string);
+
 #endif // MAIN_H
