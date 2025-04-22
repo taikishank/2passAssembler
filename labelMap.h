@@ -12,8 +12,8 @@
 #include <string>
 #include <utility> // Include for std::pair
 
-extern std::map<std::string, int> registerTable; 
-extern std::map<std::string, std::pair<std::string, int>> opcodeTable; // Declaration of the map
-extern std::set<std::string> assembler_directives;
-extern std::map<std::string, int> symbolTable;
+extern std::map<std::string, int> registerTable; // Used for register value pairs
+extern std::map<std::string, std::pair<std::string, int>> opcodeTable; // Declaration of the opcode pairings
+extern std::set<std::string> assembler_directives; // Set of all valid assembler directives
+extern std::map<std::string, int> symbolTable; // Used for pass 2 addressing for labels and literals
 #endif

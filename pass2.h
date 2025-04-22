@@ -14,10 +14,10 @@
 #include "instruction.h"
 #include "labelMap.h"
 
-void pass2(std::ofstream &listingFile, std::vector<Instruction *> instructionList);
-std::string formatOneOpcode(Instruction *instr);
-std::string formatTwoOpcode(Instruction* instr);
-std::string formatThreeOpcode(Instruction *instr, std::string base);
-std::string formatFourOpcode(Instruction *instr);
+void pass2(std::ofstream &listingFile, std::vector<Instruction *> instructionList); // Contains object code generation and listing file completion
+std::string formatOneOpcode(Instruction *instr); // Returns object code for format one
+std::string formatTwoOpcode(Instruction *instr); // Returns object code for format two
+std::string formatThreeOpcode(Instruction *instr, std::string base); // Returns object code for format three
+std::string formatFourOpcode(Instruction *instr); // Returns object code for format four
 
 #endif // PASS2_H

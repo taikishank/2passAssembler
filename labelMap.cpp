@@ -7,13 +7,19 @@
 
 #include "labelMap.h"
 
-// This is the assembler directive set!
+/*
+This file servers like a utility file, which contains sets of the assembler directives, instructions and
+their corresponding formats/opcodes, as well as a symbol table which is used to reference the 
+addresses of labels and literals. 
+*/
+
+// This is the assembler directive set
 std::set <std::string> assembler_directives = {
     "START", "END", "RESB", "RESW", "BYTE", "WORD", "BASE", "NOBASE",
     "*", "LTORG", "ORG", "EQU", "USE", "CSECT", "EXTDEF", "EXTREF"
 };
 
-// maintains map for registers
+// Maintains map for registers
 std::map<std::string, int> registerTable = {
     {"A", 0},
     {"X", 1},
@@ -29,7 +35,8 @@ std::map<std::string, int> registerTable = {
 // empty SYMTAB to be filled in as files are parsed through
 std::map<std::string, int> symbolTable = {}; 
 
-// maintains map for opcode table
+// maintains map for opcode table, which contains information as a map
+// {Instruction: (Opcode, format #)}
 std::map<std::string, std::pair<std::string, int>> opcodeTable = { 
     {"ADD", {"18", 3}},
     {"+ADD", {"18", 4}},

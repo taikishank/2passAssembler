@@ -16,6 +16,9 @@
 #include "labelMap.h"
 #include "pass2.h"
 
+/*
+This file contains the logic for pass2 which will write values into the listing file with each instruciton's corresponding object code
+*/
 void pass2(std::ofstream& listingFile, std::vector <Instruction *> instructionList)
 {
     std::string base = "";

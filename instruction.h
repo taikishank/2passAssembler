@@ -16,6 +16,7 @@
 class Instruction
 {
 public:
+// Instruction parameters
     std::string label;
     std::string operand;
     std::string instruction;
@@ -26,6 +27,7 @@ public:
     // Constructor
     Instruction(std::string lbl = "", std::string opc = "", std::string opr = "", int address = -1);
 
+    // Function to reserve bytes based on format, assembler directives
     int reserve_address_bytes();
 };
 
