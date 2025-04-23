@@ -1,8 +1,8 @@
-//Alejandro Pacheco, Taiki Shank
-//cssc0803, cssc5097
-//CS530, Spring 2025
-//Assignment #2, Two-Pass Assembler
-//pass1.cpp
+// Alejandro Pacheco, Taiki Shank
+// cssc0803, cssc0830
+// CS530, Spring 2025
+// Assignment #2, Two-Pass Assembler
+// pass1.cpp
 
 #include <iostream>
 #include <fstream>

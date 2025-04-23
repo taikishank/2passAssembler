@@ -1,9 +1,8 @@
-//Alejandro Pacheco, Taiki Shank
-//cssc0803, cssc5097
-//CS530, Spring 2025
-//Assignment #2, Two-Pass Assembler
-//labelMap.cpp
-
+// Alejandro Pacheco, Taiki Shank
+// cssc0803, cssc0830
+// CS530, Spring 2025
+// Assignment #2, Two-Pass Assembler
+// labelMap.cpp
 
 #include "labelMap.h"
 
